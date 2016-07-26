@@ -1,0 +1,205 @@
+package Pokegame;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+/**
+ * CardGame 类
+ * 包括存储扑克牌的ID数组和花色的Shape数组
+ * 扑克牌列表cardList，选手列表playerList，乱序牌组shuffledCardList
+ * @author tyt
+ *
+ */
+public class CardGame {
+	
+	private String[] ID = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A" };
+	private String[] Shape = { "方块", "梅花", "红桃", "黑桃" };
+    private List<Card>cardList;
+    private List<Player>playerList;
+    private List<Card>shuffledCardList;
+    Scanner console = new Scanner(System.in);
+    //pl用于保存游戏时各位选手所抽的牌
+    Player pl = new Player();
+    public CardGame(){
+    	this.cardList = new ArrayList<Card>();
+    	this.playerList = new ArrayList<Player>();
+    	this.shuffledCardList = new ArrayList<Card>();
+    }
+    
+    /**
+     * 向cardList中添加扑克牌
+     */
+    public void cardAdd(){
+    	for(int i=0;i<ID.length;i++)
+    		for(int k = 0;k<Shape.length;k++){
+    			Card card = new Card();
+    			card.setCardId(ID[i]);
+    			card.setCardShape(Shape[k]);
+    			cardList.add(card);
+    		}
+    }
+    
+    /**
+     * 打印得到的扑克牌
+     */
+    public void cardGet(){
+    	System.out.println("——————————创建扑克牌中，创建成功——————————");
+    	System.out.print("扑克牌为：[");
+    	for(int i =0;i<cardList.size()-1;i++){
+    		System.out.print(cardList.get(i).getCardShape()+cardList.get(i).getCardId()+",");
+    	}
+    	System.out.println(cardList.get(cardList.size()-1).getCardShape()+cardList.get(cardList.size()-1).getCardShape());
+    }
+    
+    /**
+     * 添加选手的id和姓名
+     * 并将选手添加到playerList中
+     */
+    public void playerAdd(){
+     
+    	System.out.println("——————————正在创建玩家———————————");
+    	for(int i =1;i<3;i++){
+    		   Player player = new Player();
+    	System.out.println("请输入第"+i+"位玩家的ID");
+    	String id = console.next();
+    	System.out.println("请输入第"+i+"位玩家的姓名");
+    	String name = console.next();
+    	player.setPlayerId(id);
+    	player.setPlayerName(name);
+    	playerList.add(player);
+    	}
+    	for (Player player : playerList) {
+			System.out.println("---欢迎玩家" + player.getPlayerName());
+		}	
+    }
+    
+    /**
+     * 将牌组顺序打乱，并保存到shuffledCardList中,打印乱序牌组
+     */
+    public void cardShuffle(){
+    	List<Integer>integerList = new ArrayList<Integer>();
+    	//使用Random类产生随机数
+    	Random random = new Random();
+    		Integer k;
+    		for(k=0;k<52;k++){
+    			//do~while循环，保证不重复添加
+    			do{
+    				//产生0~51的随机数
+    				k=random.nextInt(52);
+    			}while(integerList.contains(k));
+    			integerList.add(k);
+    			shuffledCardList.add(cardList.get(k));
+    		}
+    		System.out.println("---------开始洗牌……洗牌成功！---------");
+    		System.out.println("洗牌后的扑克牌为：");
+    		System.out.print("[ ");
+    		for(int i =0;i<shuffledCardList.size()-1;i++){
+    			Card cd = shuffledCardList.get(i);
+        		System.out.print(cd.getCardShape()+cd.getCardId()+",");
+        	}
+    		Card cd2 = shuffledCardList.get(shuffledCardList.size()-1);
+        	System.out.println(cd2.getCardShape()+cd2.getCardId());
+    }
+    
+    /**
+     * 发牌，使用pl存储各玩家及其所得到的的牌
+     */
+    public void dealCard(){
+    	//第1~4张牌
+    	Card cd0 = shuffledCardList.get(0);
+    	Card cd1 = shuffledCardList.get(1);
+    	Card cd2 = shuffledCardList.get(2);
+    	Card cd3 = shuffledCardList.get(3);
+    	System.out.println("---------开始发牌……---------");
+    	//玩家1拿到第一张牌，并将该牌添加到pl的playerCards1数组中。以此类推
+		System.out.println("---玩家"+playerList.get(0).getPlayerName()+"拿牌");
+		pl.getPlayerCards1().add(cd0);
+		System.out.println("---玩家"+playerList.get(1).getPlayerName()+"拿牌");
+		pl.getPlayerCards2().add(cd1);
+		System.out.println("---玩家"+playerList.get(0).getPlayerName()+"拿牌");
+		pl.getPlayerCards1().add(cd2);
+		System.out.println("---玩家"+playerList.get(1).getPlayerName()+"拿牌");
+		pl.getPlayerCards2().add(cd3);
+		System.out.println("------------发牌结束，开始游戏-------------");
+		System.out.println("玩家各自的牌为：");
+		System.out.println(playerList.get(0).getPlayerName()+":"+pl.getPlayerCards1().get(0).getCardShape()
+				+pl.getPlayerCards1().get(0).getCardId()+","+pl.getPlayerCards1().get(1).getCardShape()
+				+pl.getPlayerCards1().get(1).getCardId());
+		System.out.println(playerList.get(1).getPlayerName()+":"+pl.getPlayerCards2().get(0).getCardShape()
+				+pl.getPlayerCards2().get(0).getCardId()+","+pl.getPlayerCards2().get(1).getCardShape()
+				+pl.getPlayerCards2().get(1).getCardId());
+    	
+    	
+    }
+    
+    /**
+     * 比较规则方法
+     * 分别将存储在pl中的各玩家得到的第1,2张牌与cardList中的排序比较，当两张牌相等时，得到该牌在cardList中的位置，以此来区分大小
+     * 每个玩家首先取得2张牌位置，如m1（n1），m2（n2），再比较他们，较大者为m3（n3）
+     * 最后将m3，n3进行比较，较大者则获胜
+     */
+    
+    public void ruleCompare() {  //比较规则
+		int m1=0, m2=0, n1=0, n2=0, m3=0, n3=0;
+		for (int i = 0; i < cardList.size(); i ++) {
+			if(pl.getPlayerCards1().get(0).getCardShape().equals(cardList.get(i).getCardShape()) 
+					&& pl.getPlayerCards1().get(0).getCardId().equals(cardList.get(i).getCardId())) {
+				m1 = i;
+				break;
+			}
+		}
+		for (int i = 0; i < cardList.size(); i ++) {
+			if(pl.getPlayerCards1().get(1).getCardShape().equals(cardList.get(i).getCardShape()) 
+					&& pl.getPlayerCards1().get(1).getCardId().equals(cardList.get(i).getCardId())) {
+				m2 = i;
+				break;
+			}
+		}
+		for (int i = 0; i < cardList.size(); i ++) {
+			if(pl.getPlayerCards2().get(0).getCardShape().equals(cardList.get(i).getCardShape()) 
+					&& pl.getPlayerCards2().get(0).getCardId().equals(cardList.get(i).getCardId())) {
+				n1 = i;
+				break;
+			}
+		}
+		for (int i = 0; i < cardList.size(); i ++) {
+			if(pl.getPlayerCards2().get(1).getCardShape().equals(cardList.get(i).getCardShape()) 
+					&& pl.getPlayerCards2().get(1).getCardId().equals(cardList.get(i).getCardId())) {
+				n2 = i;
+				break;
+			}
+		}
+		if (m1<m2){
+			m3 = m2;
+		} else {
+			m3 = m1;
+		}
+		System.out.println("玩家"+playerList.get(0).getPlayerName()+"最大手牌为："
+		+cardList.get(m3).getCardShape()+cardList.get(m3).getCardId());
+		if (n1<n2) {
+			n3 = n2;
+		} else {
+			n3 = n1;
+		}
+		System.out.println("玩家"+playerList.get(1).getPlayerName()+"最大手牌为："
+				+cardList.get(n3).getCardShape()+cardList.get(n3).getCardId());
+		if (m3<n3) {
+			System.out.println("玩家"+ playerList.get(1).getPlayerName() +"获胜！");
+		} else {
+			System.out.println("玩家"+ playerList.get(0).getPlayerName() +"获胜！");
+		}
+	}
+    
+	public static void main(String[] args) {
+		CardGame cg = new CardGame();
+		cg.cardAdd();
+		cg.cardGet();
+		cg.playerAdd();
+		cg.cardShuffle();
+	    cg.dealCard();
+	    cg.ruleCompare();
+
+	}
+
+}
